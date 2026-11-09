@@ -17,6 +17,7 @@ import {
   PilcrowIcon,
   Rows3Icon,
   TextWrapIcon,
+  WorkflowIcon,
 } from "lucide-react";
 import { ChevronDown, ChevronRight, ChevronsDownUp, ChevronsUpDown } from "lucide";
 import * as Schema from "effect/Schema";
@@ -66,6 +67,7 @@ import { DiffFilePathCopyButton } from "./DiffFilePathCopyButton";
 import { DiffPanelLoadingState, DiffPanelShell, type DiffPanelMode } from "./DiffPanelShell";
 import { DiffStatLabel } from "./chat/DiffStatLabel";
 import { AnnotatableCodeView } from "./diffs/AnnotatableCodeView";
+import { ChangeFlow } from "./diffs/ChangeFlow";
 import { DiffFileTree } from "./diffs/DiffFileTree";
 import { FileExplorerPane } from "./files/FileExplorerPane";
 import { diffFileTreeEntries } from "./diffs/diffFileTree.logic";
@@ -113,6 +115,7 @@ import { useOpenLink } from "../browser/useOpenLink";
 type DiffThemeType = "light" | "dark";
 const AUTOMATIC_BASE_REF = "__automatic_base_ref__";
 const DIFF_FILE_TREE_STORAGE_KEY = "t3code.diffFileTreeOpen";
+const DIFF_CHANGE_FLOW_STORAGE_KEY = "t3code.diffChangeFlowOpen";
 const fileEntryCache = new WeakMap<
   FileDiffMetadata,
   { fileDiff: FileDiffMetadata; fileKey: string; fileVersion: number }
@@ -233,6 +236,11 @@ export default function DiffPanel({
   const [diffIgnoreWhitespace, setDiffIgnoreWhitespace] = useState(settings.diffIgnoreWhitespace);
   const [fileTreeOpen, setFileTreeOpen] = useLocalStorage(
     DIFF_FILE_TREE_STORAGE_KEY,
+    false,
+    Schema.Boolean,
+  );
+  const [changeFlowOpen, setChangeFlowOpen] = useLocalStorage(
+    DIFF_CHANGE_FLOW_STORAGE_KEY,
     false,
     Schema.Boolean,
   );
@@ -1507,6 +1515,40 @@ export default function DiffPanel({
                       selectedPath={selectedFilePath}
                       revealRequestId={selectedFileRevealRequestId}
                       onSelectFile={revealDiffFile}
+                      headerAccessory={
+                        <Tooltip>
+                          <TooltipTrigger
+                            render={
+                              <Toggle
+                                aria-label={
+                                  changeFlowOpen ? "Hide import flow" : "Show import flow"
+                                }
+                                variant="ghost"
+                                size="xs"
+                                pressed={changeFlowOpen}
+                                onPressedChange={(pressed) => setChangeFlowOpen(Boolean(pressed))}
+                              />
+                            }
+                          >
+                            <WorkflowIcon className="size-3.5" />
+                          </TooltipTrigger>
+                          <TooltipPopup>
+                            {changeFlowOpen ? "Hide import flow" : "Show import flow"}
+                          </TooltipPopup>
+                        </Tooltip>
+                      }
+                      footer={
+                        changeFlowOpen ? (
+                          <div className="flex h-1/2 min-h-0 shrink-0 flex-col border-t border-border/60">
+                            <ChangeFlow
+                              files={renderableFiles.filter(isFileShown)}
+                              sourceKey={selectedGitSource?.diffHash ?? collapseScopeKey ?? ""}
+                              loadContents={currentLoadDiffFiles ? loadDiffFiles : undefined}
+                              onSelectFile={revealDiffFile}
+                            />
+                          </div>
+                        ) : null
+                      }
                     />
                   </FileExplorerPane>
                 ) : null}
