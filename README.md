@@ -4,6 +4,12 @@ T3 Code is an "agent harness control surface". It enables control of the agents 
 
 Works with your subscriptions on Claude Code, Codex, Cursor, Grok Build, OpenCode, Google Antigravity, and fx. If they're set up on your computer, T3 Code can control them.
 
+## In this fork: import flow
+
+The Diff panel's file tree can show which changed files import each other, importers on top. Tests are dashed. Click a file to jump to its diff and list the imported names.
+
+![Import flow below the changed files tree](./docs/import-flow.png)
+
 ## "Wait, what are you selling me?"
 
 Nothing. We built T3 Code because we wanted the best possible development experience with agents. We were inspired by existing solutions like the Codex desktop app, Conductor, Claude Desktop and Cursor Glass, but none met our bar.
